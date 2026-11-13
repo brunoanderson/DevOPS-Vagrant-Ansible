@@ -1,0 +1,55 @@
+---
+- name: Criar grupo de sistema ifpb
+  ansible.builtin.group:
+    name: "{{ grupo_ifpb }}"
+    system: true
+    state: present
+
+- name: Criar usuários e adicioná-los ao grupo ifpb
+  ansible.builtin.user:
+    name: "{{ item.name }}"
+    comment: "{{ item.comment }}"
+    groups: "{{ grupo_ifpb }}"
+    append: true
+    shell: /bin/bash
+    create_home: true
+    state: present
+  loop: "{{ ifpb_usuarios }}"
+
+- name: Criar diretório local de chaves (controlador)
+  ansible.builtin.file:
+    path: "{{ chaves_dir }}"
+    state: directory
+    mode: "0700"
+  delegate_to: localhost
+  become: false
+  run_once: true
+
+- name: Gerar par de chaves ed25519 por usuário (controlador)
+  community.crypto.openssh_keypair:
+    path: "{{ chaves_dir }}/{{ item.name }}"
+    type: ed25519
+    comment: "{{ item.name }}@ifpb"
+    state: present
+  loop: "{{ ifpb_usuarios }}"
+  delegate_to: localhost
+  become: false
+  run_once: true
+
+- name: Instalar chave pública em cada usuário
+  ansible.posix.authorized_key:
+    user: "{{ item.name }}"
+    key: "{{ lookup('ansible.builtin.file', chaves_dir ~ '/' ~ item.name ~ '.pub') }}"
+    state: present
+    exclusive: true
+  loop: "{{ ifpb_usuarios }}"
+
+- name: Sudo sem senha para o grupo ifpb
+  ansible.builtin.copy:
+    dest: /etc/sudoers.d/ifpb
+    owner: root
+    group: root
+    mode: "0440"
+    content: |
+      %{{ grupo_ifpb }} ALL=(ALL:ALL) NOPASSWD: ALL
+    validate: /usr/sbin/visudo -cf %s

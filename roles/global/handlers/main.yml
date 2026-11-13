@@ -1,0 +1,11 @@
+---
+- name: Reiniciar chrony
+  ansible.builtin.service:
+    name: chrony
+    state: restarted
+    enabled: true
+
+- name: Reiniciar sshd
+  ansible.builtin.service:
+    name: ssh
+    state: restarted

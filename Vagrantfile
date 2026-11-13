@@ -12,7 +12,7 @@ nome1      = "Guilherme Matias"
 nome2      = "Bruno Anderson"
 matricula1 = "20251380012"
 matricula2 = "20251380014"
-dominio    = "guilherme1.bruno2.devops"
+dominio    = "guilherme.bruno.devops"
 
 [matricula1, matricula2].each do |matricula|
   unless matricula.match?(/\A\d{2,}\z/)
@@ -25,7 +25,7 @@ mat2_fim = matricula2[-2, 2]
 xy       = matricula1[-1] + matricula2[-1]
 
 rede     = "192.168.56"
-ip_arq   = "#{rede}.1#{xy}"
+ip_arq   = "#{rede}.1#{mat1_fim}"
 
 oui_vbox = "080027"
 mac_db   = "#{oui_vbox}#{xy}00#{mat1_fim}"

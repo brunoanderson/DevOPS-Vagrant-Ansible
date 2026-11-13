@@ -1,0 +1,13 @@
+---
+- name: Atualizar índice de pacotes (apt update)
+  ansible.builtin.apt:
+    update_cache: true
+
+- name: Atualizar todos os pacotes (apt dist-upgrade)
+  ansible.builtin.apt:
+    upgrade: dist
+
+- name: Instalar cliente NFS
+  ansible.builtin.apt:
+    name: nfs-common
+    state: present

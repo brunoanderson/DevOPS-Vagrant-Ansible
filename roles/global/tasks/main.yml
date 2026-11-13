@@ -1,0 +1,16 @@
+---
+- name: Sistema operacional
+  ansible.builtin.import_tasks: sistema.yml
+  tags: [sistema]
+
+- name: NTP e fuso horário
+  ansible.builtin.import_tasks: ntp.yml
+  tags: [ntp]
+
+- name: Grupo, usuários e sudo
+  ansible.builtin.import_tasks: usuarios.yml
+  tags: [usuarios]
+
+- name: SSH
+  ansible.builtin.import_tasks: ssh.yml
+  tags: [ssh]
