@@ -1,0 +1,16 @@
+# Projeto 01 - DevOps com Vagrant e Ansible
+# arq: 192.168.56.1XX (XX = 2 últimos dígitos da matrícula do 1º integrante)
+# db:  192.168.56.1YY (YY = 2 últimos dígitos da matrícula do 2º integrante) - via DHCP da arq
+# app: 192.168.56.1XY (último dígito de cada matrícula) - via DHCP da arq
+# db e app só respondem nesses IPs depois que o DHCP da arq estiver ativo.
+# cli recebe IP dinâmico (faixa .50 a .100): ajuste ansible_host após subir a VM.
+# Enquanto isso, use: ansible-playbook playbooks/global.yml --limit arq
+
+[servidores]
+arq ansible_host=192.168.56.112
+db  ansible_host=192.168.56.114
+app ansible_host=192.168.56.124
+cli ansible_host=CHANGE_ME
+
+[all:vars]
+ansible_user=vagrant

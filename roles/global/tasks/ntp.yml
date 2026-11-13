@@ -1,0 +1,31 @@
+---
+- name: Instalar chrony
+  ansible.builtin.apt:
+    name: chrony
+    state: present
+
+- name: Configurar chrony com pool.ntp.br
+  ansible.builtin.copy:
+    dest: /etc/chrony/chrony.conf
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      # Gerenciado pelo Ansible
+      pool {{ ntp_pool }} iburst
+      driftfile /var/lib/chrony/chrony.drift
+      makestep 1.0 3
+      rtcsync
+      keyfile /etc/chrony/chrony.keys
+      logdir /var/log/chrony
+  notify: Reiniciar chrony
+
+- name: Garantir chrony habilitado e em execução
+  ansible.builtin.service:
+    name: chrony
+    state: started
+    enabled: true
+
+- name: Ajustar fuso horário
+  community.general.timezone:
+    name: "{{ timezone }}"

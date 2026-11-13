@@ -1,0 +1,18 @@
+---
+nome1: "Guilherme Matias"
+nome2: "Bruno Anderson"
+
+grupo_ifpb: ifpb
+
+ifpb_usuarios:
+  - { name: guilherme, comment: "{{ nome1 }}" }
+  - { name: bruno,     comment: "{{ nome2 }}" }
+
+# Diretório (no controlador) onde as chaves SSH são geradas
+chaves_dir: "{{ playbook_dir }}/../files/ssh_keys"
+
+timezone: America/Recife
+ntp_pool: pool.ntp.br
+
+ssh_banner_texto: "Acesso apenas para pessoas com autorização expressa!!!"
+ssh_allow_groups: "vagrant {{ grupo_ifpb }}"

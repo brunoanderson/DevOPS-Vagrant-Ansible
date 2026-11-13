@@ -1,0 +1,6 @@
+---
+- name: Configuração global (todas as máquinas)
+  hosts: all
+  become: true
+  roles:
+    - global
