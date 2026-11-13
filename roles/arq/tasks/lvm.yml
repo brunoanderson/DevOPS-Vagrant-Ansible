@@ -1,0 +1,57 @@
+# roles/arq/tasks/lvm.yml
+---
+- name: Instalar lvm2
+  ansible.builtin.apt:
+    name: lvm2
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Validar os discos extras (existem e não possuem partições)
+  ansible.builtin.assert:
+    that:
+      - (item | basename) in ansible_facts.devices
+      - ansible_facts.devices[item | basename].partitions | length == 0
+    fail_msg: >-
+      {{ item }} não existe ou está particionado. Ajuste lvm_discos.
+      Discos sem partição detectados:
+      {{ ansible_facts.devices | dict2items
+         | selectattr('key', 'match', '^(sd|vd|xvd|nvme)')
+         | selectattr('value.partitions', 'equalto', {})
+         | map(attribute='key') | list }}
+    quiet: true
+  loop: "{{ lvm_discos }}"
+
+- name: Criar o VG com os discos extras
+  community.general.lvg:
+    vg: "{{ lvm_vg }}"
+    pvs: "{{ lvm_discos }}"
+    state: present
+
+- name: Criar o LV
+  community.general.lvol:
+    vg: "{{ lvm_vg }}"
+    lv: "{{ lvm_lv }}"
+    size: "{{ lvm_lv_tamanho }}"
+    state: present
+
+- name: Formatar o LV
+  community.general.filesystem:
+    fstype: "{{ lvm_fstype }}"
+    dev: "/dev/{{ lvm_vg }}/{{ lvm_lv }}"
+
+- name: Criar o ponto de montagem
+  ansible.builtin.file:
+    path: "{{ dados_dir }}"
+    state: directory
+    mode: "0755"
+
+- name: Montar o LV e registrar no fstab
+  ansible.posix.mount:
+    path: "{{ dados_dir }}"
+    src: "/dev/mapper/{{ lvm_vg }}-{{ lvm_lv }}"
+    fstype: "{{ lvm_fstype }}"
+    opts: defaults
+    dump: 0
+    passno: 2
+    state: mounted

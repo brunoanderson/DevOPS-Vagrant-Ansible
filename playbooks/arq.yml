@@ -1,0 +1,10 @@
+# playbooks/arq.yml
+---
+- name: Servidor de arquivos (arq) - DHCP, DNS, LVM e NFS
+  hosts: arq
+  become: true
+  vars_files:
+    # group_vars/ fica na raiz do projeto (fora de inventory/ e playbooks/)
+    - ../group_vars/all.yml
+  roles:
+    - arq

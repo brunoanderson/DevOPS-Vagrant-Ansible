@@ -1,0 +1,19 @@
+{# roles/arq/templates/named.conf.options.j2 #}
+// Gerenciado pelo Ansible
+options {
+    directory "/var/cache/bind";
+
+    recursion yes;
+    allow-query     { localhost; {{ rede_cidr }}; };
+    allow-recursion { localhost; {{ rede_cidr }}; };
+    allow-transfer  { none; };
+
+    forwarders {
+{% for forwarder in dns_forwarders %}
+        {{ forwarder }};
+{% endfor %}
+    };
+
+    dnssec-validation auto;
+    listen-on-v6 { any; };
+};

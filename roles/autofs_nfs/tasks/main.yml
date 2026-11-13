@@ -1,0 +1,42 @@
+# roles/autofs_nfs/tasks/main.yml
+---
+- name: Instalar autofs e cliente NFS
+  ansible.builtin.apt:
+    name:
+      - autofs
+      - nfs-common
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Garantir o diretório de mapas do autofs
+  ansible.builtin.file:
+    path: /etc/auto.master.d
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Registrar o mapa direto no auto.master
+  ansible.builtin.template:
+    src: nfs.autofs.j2
+    dest: /etc/auto.master.d/nfs.autofs
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Reiniciar autofs
+
+- name: Criar o mapa direto do compartilhamento NFS da arq
+  ansible.builtin.template:
+    src: auto.nfs.j2
+    dest: /etc/auto.nfs
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Reiniciar autofs
+
+- name: Garantir autofs habilitado e em execução
+  ansible.builtin.service:
+    name: autofs
+    state: started
+    enabled: true

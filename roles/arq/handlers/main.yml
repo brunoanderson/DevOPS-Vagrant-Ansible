@@ -1,0 +1,14 @@
+# roles/arq/handlers/main.yml
+---
+- name: Reiniciar isc-dhcp-server
+  ansible.builtin.service:
+    name: isc-dhcp-server
+    state: restarted
+
+- name: Reiniciar bind9
+  ansible.builtin.service:
+    name: named
+    state: restarted
+
+- name: Reexportar NFS
+  ansible.builtin.command: exportfs -ra

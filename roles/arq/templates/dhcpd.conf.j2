@@ -1,0 +1,26 @@
+{# roles/arq/templates/dhcpd.conf.j2 #}
+# Gerenciado pelo Ansible - Projeto 01 DevOps ({{ nome1 }} e {{ nome2 }})
+authoritative;
+ddns-update-style none;
+log-facility local7;
+
+option domain-name "{{ dominio }}";
+option domain-name-servers {{ ip_dns }};
+
+default-lease-time {{ dhcp_lease_padrao }};
+max-lease-time {{ dhcp_lease_maximo }};
+
+subnet {{ rede }}.0 netmask {{ rede_mascara }} {
+    range {{ rede }}.{{ dhcp_faixa_inicio }} {{ rede }}.{{ dhcp_faixa_fim }};
+    option routers {{ rede_gateway }};
+    option subnet-mask {{ rede_mascara }};
+    option broadcast-address {{ rede }}.255;
+}
+
+# Reservas manuais por MAC
+{% for reserva in dhcp_reservas %}
+host {{ reserva.nome }} {
+    hardware ethernet {{ reserva.mac }};
+    fixed-address {{ reserva.ip }};
+}
+{% endfor %}

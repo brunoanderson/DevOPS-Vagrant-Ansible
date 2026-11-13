@@ -1,0 +1,10 @@
+# playbooks/app.yml
+---
+- name: Servidor de aplicação (app) - Apache2 e autofs
+  hosts: app
+  become: true
+  vars_files:
+    - ../group_vars/all.yml
+  roles:
+    - app
+    - autofs_nfs

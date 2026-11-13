@@ -1,0 +1,3 @@
+{# roles/arq/templates/exports.j2 #}
+# Gerenciado pelo Ansible
+{{ nfs_export }} {{ rede_cidr }}(rw,sync,all_squash,anonuid={{ nfs_user.uid }},anongid={{ nfs_user.group }},no_subtree_check)

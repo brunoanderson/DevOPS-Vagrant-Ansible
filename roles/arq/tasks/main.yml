@@ -1,0 +1,17 @@
+# roles/arq/tasks/main.yml
+---
+- name: DHCP autoritativo
+  ansible.builtin.import_tasks: dhcp.yml
+  tags: [dhcp]
+
+- name: DNS autoritativo
+  ansible.builtin.import_tasks: dns.yml
+  tags: [dns]
+
+- name: LVM (VG dados e LV ifpb)
+  ansible.builtin.import_tasks: lvm.yml
+  tags: [lvm]
+
+- name: NFS
+  ansible.builtin.import_tasks: nfs.yml
+  tags: [nfs]

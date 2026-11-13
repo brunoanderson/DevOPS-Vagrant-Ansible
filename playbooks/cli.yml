@@ -1,0 +1,10 @@
+# playbooks/cli.yml
+---
+- name: Host cliente (cli) - Firefox, X11 Forwarding e autofs
+  hosts: cli
+  become: true
+  vars_files:
+    - ../group_vars/all.yml
+  roles:
+    - cli
+    - autofs_nfs

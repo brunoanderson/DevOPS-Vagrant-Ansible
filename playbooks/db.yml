@@ -1,0 +1,10 @@
+# playbooks/db.yml
+---
+- name: Servidor de banco de dados (db) - MariaDB e autofs
+  hosts: db
+  become: true
+  vars_files:
+    - ../group_vars/all.yml
+  roles:
+    - db
+    - autofs_nfs

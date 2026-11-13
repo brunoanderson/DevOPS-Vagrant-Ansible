@@ -1,0 +1,6 @@
+# roles/autofs_nfs/handlers/main.yml
+---
+- name: Reiniciar autofs
+  ansible.builtin.service:
+    name: autofs
+    state: restarted

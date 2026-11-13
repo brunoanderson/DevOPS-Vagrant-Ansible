@@ -1,0 +1,14 @@
+{# roles/arq/templates/zona_reversa.j2 #}
+; Gerenciado pelo Ansible - zona reversa {{ rede_reversa }}
+$TTL 3600
+@       IN      SOA     arq.{{ dominio }}. root.{{ dominio }}. (
+                        {{ dns_serial }}      ; Serial
+                        3600            ; Refresh
+                        1800            ; Retry
+                        604800          ; Expire
+                        3600 )          ; Negative Cache TTL
+;
+@       IN      NS      arq.{{ dominio }}.
+{{ ip_arq.split('.')[-1] }}     IN      PTR     arq.{{ dominio }}.
+{{ ip_db.split('.')[-1] }}     IN      PTR     db.{{ dominio }}.
+{{ ip_app.split('.')[-1] }}     IN      PTR     app.{{ dominio }}.

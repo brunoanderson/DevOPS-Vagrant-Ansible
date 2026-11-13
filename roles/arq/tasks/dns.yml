@@ -1,0 +1,62 @@
+# roles/arq/tasks/dns.yml
+---
+- name: Instalar bind9
+  ansible.builtin.apt:
+    name: bind9
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Criar diretório das zonas
+  ansible.builtin.file:
+    path: "{{ dns_zonas_dir }}"
+    state: directory
+    owner: root
+    group: bind
+    mode: "0755"
+
+- name: Configurar opções do bind9 (ACL da rede e forwarders)
+  ansible.builtin.template:
+    src: named.conf.options.j2
+    dest: /etc/bind/named.conf.options
+    owner: root
+    group: bind
+    mode: "0644"
+    validate: named-checkconf %s
+  notify: Reiniciar bind9
+
+- name: Declarar as zonas direta e reversa
+  ansible.builtin.template:
+    src: named.conf.local.j2
+    dest: /etc/bind/named.conf.local
+    owner: root
+    group: bind
+    mode: "0644"
+    validate: named-checkconf %s
+  notify: Reiniciar bind9
+
+- name: Criar o arquivo da zona direta
+  ansible.builtin.template:
+    src: zona_direta.j2
+    dest: "{{ dns_zonas_dir }}/db.{{ dominio }}"
+    owner: root
+    group: bind
+    mode: "0644"
+    validate: "named-checkzone {{ dominio }} %s"
+  notify: Reiniciar bind9
+
+- name: Criar o arquivo da zona reversa
+  ansible.builtin.template:
+    src: zona_reversa.j2
+    dest: "{{ dns_zonas_dir }}/db.{{ rede }}"
+    owner: root
+    group: bind
+    mode: "0644"
+    validate: "named-checkzone {{ rede_reversa }} %s"
+  notify: Reiniciar bind9
+
+- name: Garantir bind9 habilitado e em execução
+  ansible.builtin.service:
+    name: named
+    state: started
+    enabled: true

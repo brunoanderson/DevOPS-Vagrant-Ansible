@@ -1,0 +1,14 @@
+{# roles/arq/templates/zona_direta.j2 #}
+; Gerenciado pelo Ansible - zona direta {{ dominio }}
+$TTL 3600
+@       IN      SOA     arq.{{ dominio }}. root.{{ dominio }}. (
+                        {{ dns_serial }}      ; Serial
+                        3600            ; Refresh
+                        1800            ; Retry
+                        604800          ; Expire
+                        3600 )          ; Negative Cache TTL
+;
+@       IN      NS      arq.{{ dominio }}.
+arq     IN      A       {{ ip_arq }}
+db      IN      A       {{ ip_db }}
+app     IN      A       {{ ip_app }}

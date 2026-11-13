@@ -1,0 +1,11 @@
+{# roles/arq/templates/named.conf.local.j2 #}
+// Gerenciado pelo Ansible
+zone "{{ dominio }}" {
+    type master;
+    file "{{ dns_zonas_dir }}/db.{{ dominio }}";
+};
+
+zone "{{ rede_reversa }}" {
+    type master;
+    file "{{ dns_zonas_dir }}/db.{{ rede }}";
+};

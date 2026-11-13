@@ -1,0 +1,56 @@
+# group_vars/all.yml
+---
+nome1: "Guilherme Matias"
+nome2: "Bruno Anderson"
+
+grupo_ifpb: ifpb
+
+ifpb_usuarios:
+  - { name: guilherme, comment: "{{ nome1 }}" }
+  - { name: bruno,     comment: "{{ nome2 }}" }
+
+# Diretório (no controlador) onde as chaves SSH são geradas
+chaves_dir: "{{ playbook_dir }}/../files/ssh_keys"
+
+timezone: America/Recife
+ntp_pool: pool.ntp.br
+
+ssh_banner_texto: "Acesso apenas para pessoas com autorização expressa!!!"
+ssh_allow_groups: "vagrant {{ grupo_ifpb }}"
+
+# ---------------------------------------------------------------- Etapa 3
+# Dados da equipe
+matricula1: "20251380012"
+matricula2: "20251380014"
+
+# ATENÇÃO: o Vagrantfile do repositório define dominio = "guilherme.bruno.devops"
+# (hostnames das VMs). Mantenha os dois valores iguais.
+dominio: "guilherme1.bruno2.devops"
+
+# Derivados das matrículas (mesma lógica do Vagrantfile)
+mat1_fim: "{{ matricula1[-2:] }}"                  # XX = 12
+mat2_fim: "{{ matricula2[-2:] }}"                  # YY = 14
+xy: "{{ matricula1[-1] ~ matricula2[-1] }}"        # XY = 24
+
+# Rede host-only
+rede: "192.168.56"
+rede_cidr: "{{ rede }}.0/24"
+rede_mascara: "255.255.255.0"
+rede_gateway: "{{ rede }}.1"
+rede_reversa: "{{ rede.split('.') | reverse | join('.') }}.in-addr.arpa"
+
+# Endereços (arq fixo; db e app reservados por MAC no DHCP da arq)
+ip_arq: "{{ rede }}.1{{ mat1_fim }}"               # 192.168.56.1XX
+ip_db: "{{ rede }}.1{{ mat2_fim }}"                # 192.168.56.1YY
+ip_app: "{{ rede }}.1{{ xy }}"                     # 192.168.56.1XY
+ip_dns: "{{ ip_arq }}"
+
+# MACs das VMs db e app (devem ser idênticos aos do Vagrantfile)
+oui_vbox: "08:00:27"
+mac_db: "{{ oui_vbox }}:{{ xy }}:00:{{ mat1_fim }}"
+mac_app: "{{ oui_vbox }}:{{ xy }}:00:{{ mat2_fim }}"
+
+# Compartilhamento NFS (servidor: arq | clientes: db, app, cli)
+dados_dir: /dados
+nfs_export: "{{ dados_dir }}/nfs"
+nfs_ponto_montagem: /var/nfs

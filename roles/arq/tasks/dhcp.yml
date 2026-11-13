@@ -1,0 +1,44 @@
+# roles/arq/tasks/dhcp.yml
+---
+- name: Instalar isc-dhcp-server
+  ansible.builtin.apt:
+    name: isc-dhcp-server
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Descobrir a interface da rede host-only
+  ansible.builtin.set_fact:
+    dhcp_interface: >-
+      {{ ansible_facts.interfaces
+         | select('in', ansible_facts)
+         | map('extract', ansible_facts)
+         | selectattr('ipv4', 'defined')
+         | selectattr('ipv4.address', 'equalto', ip_arq)
+         | map(attribute='device')
+         | list | first | default('eth1', true) }}
+
+- name: Definir a interface de escuta do DHCP
+  ansible.builtin.template:
+    src: isc-dhcp-server.j2
+    dest: /etc/default/isc-dhcp-server
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Reiniciar isc-dhcp-server
+
+- name: Configurar o dhcpd.conf (autoritativo, reservas por MAC)
+  ansible.builtin.template:
+    src: dhcpd.conf.j2
+    dest: /etc/dhcp/dhcpd.conf
+    owner: root
+    group: root
+    mode: "0644"
+    validate: /usr/sbin/dhcpd -t -cf %s
+  notify: Reiniciar isc-dhcp-server
+
+- name: Garantir isc-dhcp-server habilitado e em execução
+  ansible.builtin.service:
+    name: isc-dhcp-server
+    state: started
+    enabled: true

@@ -1,0 +1,22 @@
+# roles/app/tasks/main.yml
+---
+- name: Instalar apache2
+  ansible.builtin.apt:
+    name: apache2
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Publicar o index.html (substitui a página padrão do Apache)
+  ansible.builtin.template:
+    src: index.html.j2
+    dest: /var/www/html/index.html
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Garantir apache2 habilitado e em execução
+  ansible.builtin.service:
+    name: apache2
+    state: started
+    enabled: true

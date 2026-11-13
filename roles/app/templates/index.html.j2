@@ -1,0 +1,51 @@
+{# roles/app/templates/index.html.j2 #}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Projeto 01 – DevOps com Vagrant e Ansible</title>
+  <style>
+    :root { color-scheme: light dark; }
+    body { font-family: system-ui, sans-serif; max-width: 46rem; margin: 3rem auto; padding: 0 1rem; line-height: 1.6; }
+    h1 { margin-bottom: .25rem; }
+    .sub { margin-top: 0; opacity: .7; }
+    table { border-collapse: collapse; width: 100%; margin: 1rem 0; }
+    th, td { border: 1px solid #8884; padding: .5rem .75rem; text-align: left; }
+    footer { margin-top: 2rem; font-size: .85rem; opacity: .7; }
+  </style>
+</head>
+<body>
+  <h1>Projeto 01 – DevOps com Vagrant e Ansible</h1>
+  <p class="sub">Administração de Sistemas Abertos · IFPB – Campus João Pessoa · 2026.2</p>
+
+  <h2>Descrição do projeto</h2>
+  <p>
+    Infraestrutura de quatro máquinas virtuais provisionadas com Vagrant e configuradas
+    de forma idempotente com Ansible:
+  </p>
+  <ul>
+    <li><strong>arq</strong> ({{ ip_arq }}): servidor de arquivos – DHCP e DNS autoritativos, LVM e NFS;</li>
+    <li><strong>db</strong> ({{ ip_db }}): servidor de banco de dados – MariaDB;</li>
+    <li><strong>app</strong> ({{ ip_app }}): servidor de aplicação – Apache2 (esta página);</li>
+    <li><strong>cli</strong>: host cliente – Firefox ESR com exportação de X11 via SSH.</li>
+  </ul>
+  <p>
+    As VMs db, app e cli montam automaticamente, via autofs, o compartilhamento NFS
+    <code>{{ nfs_export }}</code> da arq em <code>{{ nfs_ponto_montagem }}</code>.
+  </p>
+
+  <h2>Integrantes</h2>
+  <table>
+    <thead>
+      <tr><th>Nome</th><th>Matrícula</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>{{ nome1 }}</td><td>{{ matricula1 }}</td></tr>
+      <tr><td>{{ nome2 }}</td><td>{{ matricula2 }}</td></tr>
+    </tbody>
+  </table>
+
+  <footer>app.{{ dominio }}</footer>
+</body>
+</html>

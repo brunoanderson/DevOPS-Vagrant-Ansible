@@ -1,0 +1,31 @@
+# roles/arq/defaults/main.yml
+---
+# DHCP
+dhcp_lease_padrao: 180
+dhcp_lease_maximo: 3600
+dhcp_faixa_inicio: 50
+dhcp_faixa_fim: 100
+dhcp_reservas:
+  - { nome: db,  mac: "{{ mac_db }}",  ip: "{{ ip_db }}" }
+  - { nome: app, mac: "{{ mac_app }}", ip: "{{ ip_app }}" }
+
+# DNS
+dns_forwarders:
+  - 1.1.1.1
+  - 8.8.8.8
+dns_zonas_dir: /etc/bind/zones
+# Incrementar (AAAAMMDDNN) a cada alteração do conteúdo das zonas
+dns_serial: 2026111201
+
+# LVM (discos extras do Vagrantfile: arq-disco1..3 -> sdb, sdc, sdd)
+lvm_discos:
+  - /dev/sdb
+  - /dev/sdc
+  - /dev/sdd
+lvm_vg: dados
+lvm_lv: ifpb
+lvm_lv_tamanho: 15g
+lvm_fstype: ext4
+
+# NFS
+nfs_usuario: nfs-ifpb
