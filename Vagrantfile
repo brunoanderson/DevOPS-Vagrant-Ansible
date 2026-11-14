@@ -1,4 +1,3 @@
-
 Vagrant.require_version ">= 2.2.8"
 
 if Gem::Version.new(Vagrant::VERSION) < Gem::Version.new("2.4.0") &&
@@ -36,9 +35,6 @@ ip_selecao_rede = "#{rede}.2"
 
 fqdn = ->(vm) { "#{vm}.#{dominio}" }
 
-# Configura a interface host-only (identificada pelo MAC) para obter IP via DHCP da arq,
-# de forma persistente, e prioriza o DNS da arq. Rota padrão da host-only com metric alto
-# para não sobrepor a saída pela NAT.
 provisionar_rede_dhcp = lambda do |vm, mac|
   vm.provision "shell", name: "Rede host-only via DHCP da arq",
     args: [mac.scan(/../).join(":"), ip_arq, dominio],
@@ -56,7 +52,7 @@ provisionar_rede_dhcp = lambda do |vm, mac|
       EOF
       if ! grep -q '# ifpb-dns' /etc/dhcp/dhclient.conf; then
         cat >> /etc/dhcp/dhclient.conf <<EOF
-      # ifpb-dns
+
       prepend domain-name-servers $DNS;
       supersede domain-name "$DOMINIO";
       EOF
@@ -79,7 +75,6 @@ desabilitar_dhcp_virtualbox = lambda do |maquina|
   listagem = driver.execute_command(["list", "dhcpservers"])
   raise "VBoxManage falhou" unless $?.success?
 
-  # Correção 1: Removido o .stdout, usando a string diretamente
   listagem.to_s.split(/\r?\n[ \t]*\r?\n/).each do |bloco|
     campos = {}
     bloco.each_line do |linha|
@@ -95,7 +90,6 @@ desabilitar_dhcp_virtualbox = lambda do |maquina|
     next if campos["enabled"].to_s.casecmp?("no")
 
     [["--network", nome], ["--netname", nome]].any? do |opcao|
-      # Correção 2: Tratando o erro do comando sem usar .exit_code
       begin
         driver.execute_command(["dhcpserver", "modify", *opcao, "--disable"])
         true

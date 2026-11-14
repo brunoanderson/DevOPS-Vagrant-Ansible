@@ -1,4 +1,10 @@
 ---
+- name: Pré-configurar grub-pc para /dev/sda (evita trava em linked_clone)
+  ansible.builtin.shell: |
+    echo "grub-pc grub-pc/install_devices multiselect /dev/sda" | debconf-set-selections
+    echo "grub-pc grub-pc/install_devices_disks_changed multiselect /dev/sda" | debconf-set-selections
+  changed_when: false
+
 - name: Atualizar índice de pacotes (apt update)
   ansible.builtin.apt:
     update_cache: true
@@ -6,6 +12,9 @@
 - name: Atualizar todos os pacotes (apt dist-upgrade)
   ansible.builtin.apt:
     upgrade: dist
+    dpkg_options: "force-confdef,force-confold"
+  environment:
+    DEBIAN_FRONTEND: noninteractive
 
 - name: Instalar cliente NFS
   ansible.builtin.apt:

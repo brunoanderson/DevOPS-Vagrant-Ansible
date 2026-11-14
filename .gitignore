@@ -8,3 +8,7 @@ keys/
 keys/
 files/ssh_keys/
 .vagrant/
+.vagrant/
+keys/
+files/ssh_keys/
+*.retry
