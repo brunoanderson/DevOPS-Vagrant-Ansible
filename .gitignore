@@ -4,11 +4,4 @@ files/ssh_keys/*
 keys/
 .vagrant/
 *.retry
-
-keys/
-files/ssh_keys/
-.vagrant/
-.vagrant/
-keys/
-files/ssh_keys/
-*.retry
+proj.py
