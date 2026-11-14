@@ -351,6 +351,7 @@ python3 verifica-proj1.py guilherme.bruno
 | `db`/`app`/`cli` sem IP `192.168.56.x` | Subiram antes do DHCP da `arq` | Conclua a Fase 1 e rode `vagrant provision <vm>` |
 | `ansible-playbook` não conecta em `db`/`app`/`cli` | VM sem lease DHCP | Verifique `vagrant ssh <vm> -c "ip -4 -br a"` e o item acima |
 | Nomes não resolvem no host | Host não usa o DNS da `arq` | Aplique o `resolvectl` do item 4.2 (a) |
+
 | `REMOTE HOST IDENTIFICATION HAS CHANGED` | VMs recriadas | Use o bloco `Host` da seção 3.3 ou `ssh-keygen -R <host>` |
 | `ModuleNotFoundError: cryptography` ao gerar chaves | Dependência ausente no controlador | `pip install cryptography` |
 
@@ -361,3 +362,15 @@ python3 verifica-proj1.py guilherme.bruno
 - As chaves **privadas** em `files/ssh_keys/` são ignoradas pelo Git (`.gitignore`); apenas as públicas (`*.pub`) são versionadas.
 - Os usuários `guilherme` e `bruno` não possuem senha: o acesso é exclusivamente por chave pública.
 - O usuário `vagrant` continua com acesso por chave (a chave padrão do Vagrant), exigido pelo grupo `vagrant` em `AllowGroups`.
+
+## 7. Comandos para ser utilizado
+
+- vagrant up arq
+- ansible-playbook playbooks/site.yml --limit arq
+- mkdir -p keys && cp files/ssh_keys/* keys/ && chmod 600 keys/bruno keys/guilherme
+- vagrant up db app cli
+- ansible-playbook playbooks/site.yml
+- ssh-keyscan -H arq.guilherme.bruno.devops app.guilherme.bruno.devops 
+db.guilherme.bruno.devops cli.guilherme.bruno.devops 192.168.56.112 192.168.56.114 192.168.56.124 192.168.56.60 >> ~/.ssh/known_hosts 2>/dev/null
+- ./proj.py guilherme.bruno
+

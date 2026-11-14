@@ -1,4 +1,3 @@
-# playbooks/app.yml
 ---
 - name: Servidor de aplicação (app) - Apache2 e autofs
   hosts: app

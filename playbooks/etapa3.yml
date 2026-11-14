@@ -1,6 +1,4 @@
 ---
-# Uso: ansible-playbook playbooks/etapa3.yml
-# A arq precisa vir primeiro: DHCP, DNS e NFS são pré-requisitos das demais VMs.
 - name: Servidor de arquivos (arq)
   ansible.builtin.import_playbook: arq.yml
 

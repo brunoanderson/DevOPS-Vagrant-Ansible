@@ -1,4 +1,3 @@
-# playbooks/cli.yml
 ---
 - name: Host cliente (cli) - Firefox, X11 Forwarding e autofs
   hosts: cli
