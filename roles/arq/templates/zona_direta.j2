@@ -2,7 +2,7 @@
 ; Gerenciado pelo Ansible - zona direta {{ dominio }}
 $TTL 3600
 @       IN      SOA     arq.{{ dominio }}. root.{{ dominio }}. (
-                        {{ dns_serial }}      ; Serial
+                        {{ arq_dns_serial }}      ; Serial
                         3600            ; Refresh
                         1800            ; Retry
                         604800          ; Expire
@@ -12,3 +12,4 @@ $TTL 3600
 arq     IN      A       {{ ip_arq }}
 db      IN      A       {{ ip_db }}
 app     IN      A       {{ ip_app }}
+cli     IN      A       {{ ip_cli }}

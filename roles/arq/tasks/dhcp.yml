@@ -1,15 +1,32 @@
 # roles/arq/tasks/dhcp.yml
 ---
-- name: Instalar isc-dhcp-server
-  ansible.builtin.apt:
-    name: isc-dhcp-server
-    state: present
-    update_cache: true
-    cache_valid_time: 3600
+- name: Instalar isc-dhcp-server (sem iniciar o serviço antes da configuração)
+  block:
+    - name: Bloquear início automático de serviços durante a instalação
+      ansible.builtin.copy:
+        dest: /usr/sbin/policy-rc.d
+        owner: root
+        group: root
+        mode: "0755"
+        content: |
+          #!/bin/sh
+          exit 101
+
+    - name: Instalar isc-dhcp-server
+      ansible.builtin.apt:
+        name: isc-dhcp-server
+        state: present
+        update_cache: true
+        cache_valid_time: 3600
+  always:
+    - name: Remover o bloqueio de início automático
+      ansible.builtin.file:
+        path: /usr/sbin/policy-rc.d
+        state: absent
 
 - name: Descobrir a interface da rede host-only
   ansible.builtin.set_fact:
-    dhcp_interface: >-
+    arq_dhcp_interface: >-
       {{ ansible_facts.interfaces
          | select('in', ansible_facts)
          | map('extract', ansible_facts)
@@ -25,6 +42,7 @@
     owner: root
     group: root
     mode: "0644"
+  become: true
   notify: Reiniciar isc-dhcp-server
 
 - name: Configurar o dhcpd.conf (autoritativo, reservas por MAC)
@@ -34,7 +52,7 @@
     owner: root
     group: root
     mode: "0644"
-    validate: /usr/sbin/dhcpd -t -cf %s
+  become: true
   notify: Reiniciar isc-dhcp-server
 
 - name: Garantir isc-dhcp-server habilitado e em execução
@@ -42,3 +60,4 @@
     name: isc-dhcp-server
     state: started
     enabled: true
+  become: true

@@ -28,7 +28,7 @@
     <li><strong>arq</strong> ({{ ip_arq }}): servidor de arquivos – DHCP e DNS autoritativos, LVM e NFS;</li>
     <li><strong>db</strong> ({{ ip_db }}): servidor de banco de dados – MariaDB;</li>
     <li><strong>app</strong> ({{ ip_app }}): servidor de aplicação – Apache2 (esta página);</li>
-    <li><strong>cli</strong>: host cliente – Firefox ESR com exportação de X11 via SSH.</li>
+    <li><strong>cli</strong> ({{ ip_cli }}): host cliente – Firefox ESR com exportação de X11 via SSH.</li>
   </ul>
   <p>
     As VMs db, app e cli montam automaticamente, via autofs, o compartilhamento NFS

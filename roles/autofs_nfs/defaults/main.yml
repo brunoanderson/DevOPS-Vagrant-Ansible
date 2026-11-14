@@ -1,5 +1,5 @@
 # roles/autofs_nfs/defaults/main.yml
 ---
-nfs_servidor: "{{ ip_arq }}"
-nfs_opcoes_montagem: "-fstype=nfs4,rw,nosuid,nodev"
-autofs_timeout: 60
+autofs_nfs_servidor: "{{ ip_arq }}"
+autofs_nfs_opcoes_montagem: "-fstype=nfs4,rw,nosuid,nodev"
+autofs_nfs_timeout: 60

@@ -12,3 +12,4 @@
 
 - name: Reexportar NFS
   ansible.builtin.command: exportfs -ra
+  changed_when: true

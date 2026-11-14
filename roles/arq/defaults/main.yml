@@ -1,31 +1,32 @@
 # roles/arq/defaults/main.yml
 ---
 # DHCP
-dhcp_lease_padrao: 180
-dhcp_lease_maximo: 3600
-dhcp_faixa_inicio: 50
-dhcp_faixa_fim: 100
-dhcp_reservas:
-  - { nome: db,  mac: "{{ mac_db }}",  ip: "{{ ip_db }}" }
+arq_dhcp_lease_padrao: 180
+arq_dhcp_lease_maximo: 3600
+arq_dhcp_faixa_inicio: 50
+arq_dhcp_faixa_fim: 100
+arq_dhcp_reservas:
+  - { nome: db, mac: "{{ mac_db }}", ip: "{{ ip_db }}" }
   - { nome: app, mac: "{{ mac_app }}", ip: "{{ ip_app }}" }
+  - { nome: cli, mac: "{{ mac_cli }}", ip: "{{ ip_cli }}" }
 
 # DNS
-dns_forwarders:
+arq_dns_forwarders:
   - 1.1.1.1
   - 8.8.8.8
-dns_zonas_dir: /etc/bind/zones
+arq_dns_zonas_dir: /etc/bind/zones
 # Incrementar (AAAAMMDDNN) a cada alteração do conteúdo das zonas
-dns_serial: 2026111201
+arq_dns_serial: 2026111301
 
 # LVM (discos extras do Vagrantfile: arq-disco1..3 -> sdb, sdc, sdd)
-lvm_discos:
+arq_lvm_discos:
   - /dev/sdb
   - /dev/sdc
   - /dev/sdd
-lvm_vg: dados
-lvm_lv: ifpb
-lvm_lv_tamanho: 15g
-lvm_fstype: ext4
+arq_lvm_vg: dados
+arq_lvm_lv: ifpb
+arq_lvm_lv_tamanho: 15g
+arq_lvm_fstype: ext4
 
 # NFS
-nfs_usuario: nfs-ifpb
+arq_nfs_usuario: nfs-ifpb

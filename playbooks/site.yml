@@ -1,0 +1,7 @@
+---
+# Uso (com as 4 VMs no ar): ansible-playbook playbooks/site.yml
+- name: Configuração global (todas as VMs)
+  ansible.builtin.import_playbook: global.yml
+
+- name: Serviços de cada VM (arq, db, app, cli)
+  ansible.builtin.import_playbook: etapa3.yml

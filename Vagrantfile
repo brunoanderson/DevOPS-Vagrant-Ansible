@@ -30,21 +30,57 @@ ip_arq   = "#{rede}.1#{mat1_fim}"
 oui_vbox = "080027"
 mac_db   = "#{oui_vbox}#{xy}00#{mat1_fim}"
 mac_app  = "#{oui_vbox}#{xy}00#{mat2_fim}"
+mac_cli  = "#{oui_vbox}#{xy}01#{mat1_fim}"
 
 ip_selecao_rede = "#{rede}.2"
 
 fqdn = ->(vm) { "#{vm}.#{dominio}" }
 
+# Configura a interface host-only (identificada pelo MAC) para obter IP via DHCP da arq,
+# de forma persistente, e prioriza o DNS da arq. Rota padrão da host-only com metric alto
+# para não sobrepor a saída pela NAT.
+provisionar_rede_dhcp = lambda do |vm, mac|
+  vm.provision "shell", name: "Rede host-only via DHCP da arq",
+    args: [mac.scan(/../).join(":"), ip_arq, dominio],
+    inline: <<~'SH'
+
+      set -eu
+      MAC="$1"; DNS="$2"; DOMINIO="$3"
+      IFACE="$(ip -o link | awk -v m="$MAC" 'tolower($0) ~ tolower(m) { sub(/:$/, "", $2); print $2; exit }')"
+      [ -n "$IFACE" ] || { echo "Interface com MAC $MAC nao encontrada" >&2; exit 1; }
+      mkdir -p /etc/network/interfaces.d /etc/dhcp
+      cat > /etc/network/interfaces.d/hostonly <<EOF
+      auto $IFACE
+      iface $IFACE inet dhcp
+          metric 200
+      EOF
+      if ! grep -q '# ifpb-dns' /etc/dhcp/dhclient.conf; then
+        cat >> /etc/dhcp/dhclient.conf <<EOF
+      # ifpb-dns
+      prepend domain-name-servers $DNS;
+      supersede domain-name "$DOMINIO";
+      EOF
+      fi
+      if command -v ifup >/dev/null 2>&1; then
+        timeout 90 ifup "$IFACE" || true
+      else
+        timeout 90 dhclient -v "$IFACE" || true
+      fi
+    SH
+end
+
 descricao = lambda do |papel|
   "Projeto 01 DevOps - #{papel} - Equipe: #{nome1} e #{nome2}"
 end
 
+
 desabilitar_dhcp_virtualbox = lambda do |maquina|
   driver = maquina.provider.driver
   listagem = driver.execute_command(["list", "dhcpservers"])
-  raise "VBoxManage falhou" unless listagem.exit_code.zero?
+  raise "VBoxManage falhou" unless $?.success?
 
-  listagem.stdout.to_s.split(/\r?\n[ \t]*\r?\n/).each do |bloco|
+  # Correção 1: Removido o .stdout, usando a string diretamente
+  listagem.to_s.split(/\r?\n[ \t]*\r?\n/).each do |bloco|
     campos = {}
     bloco.each_line do |linha|
       chave, valor = linha.split(":", 2)
@@ -59,7 +95,13 @@ desabilitar_dhcp_virtualbox = lambda do |maquina|
     next if campos["enabled"].to_s.casecmp?("no")
 
     [["--network", nome], ["--netname", nome]].any? do |opcao|
-      driver.execute_command(["dhcpserver", "modify", *opcao, "--disable"]).exit_code.zero?
+      # Correção 2: Tratando o erro do comando sem usar .exit_code
+      begin
+        driver.execute_command(["dhcpserver", "modify", *opcao, "--disable"])
+        true
+      rescue
+        false
+      end
     end
   end
 end
@@ -102,6 +144,7 @@ Vagrant.configure("2") do |config|
   config.vm.define "db" do |db|
     db.vm.hostname = fqdn.call("db")
     db.vm.network "private_network", ip: ip_selecao_rede, mac: mac_db, auto_config: false
+    provisionar_rede_dhcp.call(db.vm, mac_db)
 
     db.vm.provider "virtualbox" do |vb|
       vb.name = fqdn.call("db")
@@ -112,6 +155,7 @@ Vagrant.configure("2") do |config|
   config.vm.define "app" do |app|
     app.vm.hostname = fqdn.call("app")
     app.vm.network "private_network", ip: ip_selecao_rede, mac: mac_app, auto_config: false
+    provisionar_rede_dhcp.call(app.vm, mac_app)
 
     app.vm.provider "virtualbox" do |vb|
       vb.name = fqdn.call("app")
@@ -121,7 +165,8 @@ Vagrant.configure("2") do |config|
 
   config.vm.define "cli" do |cli|
     cli.vm.hostname = fqdn.call("cli")
-    cli.vm.network "private_network", ip: ip_selecao_rede, auto_config: false
+    cli.vm.network "private_network", ip: ip_selecao_rede, mac: mac_cli, auto_config: false
+    provisionar_rede_dhcp.call(cli.vm, mac_cli)
 
     cli.vm.provider "virtualbox" do |vb|
       vb.name   = fqdn.call("cli")

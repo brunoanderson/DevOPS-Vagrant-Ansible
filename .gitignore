@@ -1,3 +1,10 @@
 files/ssh_keys/*
 !files/ssh_keys/*.pub
 !files/ssh_keys/.gitkeep
+keys/
+.vagrant/
+*.retry
+
+keys/
+files/ssh_keys/
+.vagrant/

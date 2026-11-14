@@ -2,10 +2,10 @@
 // Gerenciado pelo Ansible
 zone "{{ dominio }}" {
     type master;
-    file "{{ dns_zonas_dir }}/db.{{ dominio }}";
+    file "{{ arq_dns_zonas_dir }}/db.{{ dominio }}";
 };
 
 zone "{{ rede_reversa }}" {
     type master;
-    file "{{ dns_zonas_dir }}/db.{{ rede }}";
+    file "{{ arq_dns_zonas_dir }}/db.{{ rede }}";
 };
